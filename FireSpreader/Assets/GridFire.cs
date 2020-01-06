@@ -42,9 +42,6 @@ public class GridFire : MonoBehaviour
     {
         if (timer < 0f)
         {
-            //if we have a grid
-            if (grid.Length > 0)
-            {
                 List<Vector2Int> nextFireCells = new List<Vector2Int>();
                 //for each cell check something
                 for (int x = 0; x < gridX; x++)
@@ -54,7 +51,7 @@ public class GridFire : MonoBehaviour
                         //if there is a fire in the cell spawn new fire around it.
                         if (grid[x, y] != null)
                         {
-                            if (Random.Range(0f, 1f) > 0.5f)
+                            if (Random.Range(0f, 1f) > 0.9f)
                             {
                                 nextFireCells.AddRange(GetEmptyNeighbours(new Vector2Int(x, y)));
                             }
@@ -65,13 +62,16 @@ public class GridFire : MonoBehaviour
                 {
                     if (grid[pos.x, pos.y] == null)
                     {
-                        GameObject cellFire = Instantiate(fire, new Vector3(gridStart.x + pos.x * cellSize, gridStart.y, gridStart.z + pos.y * cellSize), Quaternion.identity, transform) as GameObject;
-                        grid[pos.x, pos.y] = cellFire;
+                        RaycastHit hit;
+                        //shoots a ray from the top of the fire boundary collider towards the ground.  
+                        if (Physics.Raycast(new Vector3(gridStart.x + pos.x * cellSize, gridPlane.bounds.max.y, gridStart.z + pos.y * cellSize), Vector3.down, out hit)){
+                            GameObject cellFire = Instantiate(fire, hit.point, Quaternion.identity, transform) as GameObject;
+                            grid[pos.x, pos.y] = cellFire;
+                        }
                     }
                 }
-            }
 
-            timer = Random.Range(1f, 3f);
+            timer = Random.Range(0.5f, 1.5f);
         }
         else
         {
